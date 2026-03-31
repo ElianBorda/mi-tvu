@@ -1,16 +1,51 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Role } from "@/data/types";
+import AppSidebar from "@/components/AppSidebar";
+import Topbar from "@/components/Topbar";
+import TutorDashboard from "@/pages/TutorDashboard";
+import StudentDashboard from "@/pages/StudentDashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
-  return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
-  );
+const userNames: Record<Role, string> = {
+  student: "Lucía Martínez",
+  tutor: "María González",
+  admin: "Admin TVU",
 };
 
-const Index = PlaceholderIndex;
+export default function Index() {
+  const [role, setRole] = useState<Role>("tutor");
+  const [activeItem, setActiveItem] = useState("home");
+  const [showStudentCalendar, setShowStudentCalendar] = useState(false);
 
-export default Index;
+  const handleSidebarClick = (id: string) => {
+    setActiveItem(id);
+    if (role === "student" && id === "calendar") {
+      setShowStudentCalendar(prev => !prev);
+    }
+    if (id === "redes") {
+      window.open("https://www.unq.edu.ar", "_blank");
+    }
+  };
+
+  const handleRoleChange = (newRole: Role) => {
+    setRole(newRole);
+    setActiveItem("home");
+    setShowStudentCalendar(false);
+  };
+
+  return (
+    <div className="flex min-h-screen w-full">
+      <AppSidebar role={role} activeItem={activeItem} onItemClick={handleSidebarClick} />
+      <div className="flex-1 flex flex-col ml-56">
+        <Topbar userName={userNames[role]} role={role} onRoleChange={handleRoleChange} />
+        <main className="flex-1 p-6">
+          {role === "tutor" && <TutorDashboard />}
+          {role === "student" && (
+            <StudentDashboard showCalendar={showStudentCalendar} onCloseCalendar={() => setShowStudentCalendar(false)} />
+          )}
+          {role === "admin" && <AdminDashboard />}
+        </main>
+      </div>
+    </div>
+  );
+}
