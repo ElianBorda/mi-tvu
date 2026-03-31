@@ -21,7 +21,7 @@ export default function TutorDashboard() {
   }
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col lg:flex-row gap-6">
       {/* Left: Commissions */}
       <div className="flex-1 min-w-0">
         <div className="mb-4">
@@ -36,7 +36,7 @@ export default function TutorDashboard() {
       </div>
 
       {/* Right: Calendar */}
-      <div className="w-80 shrink-0">
+      <div className="w-full lg:w-80 shrink-0">
         <CalendarPanel events={tutorEvents} onAddEvent={() => {}} />
       </div>
     </div>
