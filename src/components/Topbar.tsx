@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, Menu } from "lucide-react";
 import { Role } from "@/data/types";
 import NotificationDropdown from "./NotificationDropdown";
 
@@ -7,17 +7,23 @@ interface TopbarProps {
   userName: string;
   role: Role;
   onRoleChange: (role: Role) => void;
+  onMenuClick: () => void;
 }
 
-export default function Topbar({ userName, role, onRoleChange }: TopbarProps) {
+export default function Topbar({ userName, role, onRoleChange, onMenuClick }: TopbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   const unreadCount = 2;
 
   return (
-    <header className="h-14 bg-card border-b border-border flex items-center px-6 gap-4 sticky top-0 z-30">
+    <header className="h-14 bg-card border-b border-border flex items-center px-3 sm:px-6 gap-2 sm:gap-4 sticky top-0 z-30">
+      {/* Mobile menu button */}
+      <button onClick={onMenuClick} className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors">
+        <Menu size={20} className="text-foreground" />
+      </button>
+
       {/* Search */}
-      <div className="flex-1 max-w-2xl relative">
+      <div className="flex-1 max-w-2xl relative hidden sm:block">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
@@ -26,11 +32,13 @@ export default function Topbar({ userName, role, onRoleChange }: TopbarProps) {
         />
       </div>
 
+      <div className="flex-1 sm:hidden" />
+
       {/* Role switcher */}
       <select
         value={role}
         onChange={e => onRoleChange(e.target.value as Role)}
-        className="h-9 px-3 rounded-lg bg-secondary text-sm text-foreground border-none focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+        className="h-9 px-2 sm:px-3 rounded-lg bg-secondary text-xs sm:text-sm text-foreground border-none focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
       >
         <option value="student">Estudiante</option>
         <option value="tutor">Tutor</option>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Commission, Role } from "@/data/types";
 import { getStudentsForCommission, getTutorForCommission, announcements } from "@/data/mockData";
-import { Building, MapPin, GraduationCap, Building2, Hash, Clock, Sun, User, Mail, Megaphone, Plus } from "lucide-react";
+import { Building, MapPin, GraduationCap, Building2, Hash, Clock, Sun, User, Mail } from "lucide-react";
 import AnnouncementPanel from "./AnnouncementPanel";
 import MetricsPanel from "./MetricsPanel";
 
@@ -21,24 +21,24 @@ export default function CommissionDetail({ commission, role, onBack }: Props) {
   return (
     <div className="h-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <div className="flex items-center gap-3">
           {onBack && (
             <button onClick={onBack} className="text-sm text-primary hover:underline">← Volver</button>
           )}
-          <h1 className="text-2xl font-bold text-foreground">{commission.name}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{commission.name}</h1>
         </div>
-        <div className="flex gap-1 bg-secondary rounded-lg p-1">
+        <div className="flex gap-1 bg-secondary rounded-lg p-1 w-fit">
           <button
             onClick={() => setActiveTab("participants")}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === "participants" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${activeTab === "participants" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
           >
             Participantes
           </button>
           {showMetricsTab && (
             <button
               onClick={() => setActiveTab("metrics")}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === "metrics" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+              className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${activeTab === "metrics" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
             >
               Métricas
             </button>
@@ -47,13 +47,13 @@ export default function CommissionDetail({ commission, role, onBack }: Props) {
       </div>
 
       {activeTab === "participants" ? (
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Left section */}
           <div className="flex-1 min-w-0">
             {/* Commission data */}
             <div className="bg-card rounded-lg shadow-card p-5 mb-6 border border-border">
               <h3 className="text-sm font-semibold text-foreground mb-4">Datos de la comisión</h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <InfoRow icon={Building} label="Aula" value={commission.classroom} />
                 <InfoRow icon={MapPin} label="Localidad" value={commission.locality} />
                 {commission.career && <InfoRow icon={GraduationCap} label="Carrera" value={commission.career} />}
@@ -67,8 +67,8 @@ export default function CommissionDetail({ commission, role, onBack }: Props) {
             </div>
 
             {/* Participants table */}
-            <div className="bg-card rounded-lg shadow-card border border-border overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-card rounded-lg shadow-card border border-border overflow-x-auto">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="bg-primary text-primary-foreground">
                     <th className="px-4 py-2.5 text-left font-medium">Nº</th>
@@ -107,7 +107,7 @@ export default function CommissionDetail({ commission, role, onBack }: Props) {
           </div>
 
           {/* Right: Announcements */}
-          <div className="w-80 shrink-0">
+          <div className="w-full lg:w-80 shrink-0">
             <AnnouncementPanel announcements={commAnnouncements} canCreate={role === "tutor" || role === "admin"} />
           </div>
         </div>

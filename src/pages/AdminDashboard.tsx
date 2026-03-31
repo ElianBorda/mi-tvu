@@ -120,7 +120,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col xl:flex-row gap-6">
       {/* Left: Table */}
       <div className="flex-1 min-w-0">
         {/* Tab pills */}
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
             <button
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${
                 view === tab.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Right: Metrics */}
-      <div className="w-80 shrink-0 space-y-4">
+      <div className="w-full xl:w-80 shrink-0 space-y-4">
         <h2 className="text-base font-semibold text-foreground">Métricas generales</h2>
 
         {/* KPI cards */}
