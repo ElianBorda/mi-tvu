@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { commissions, tutors, students, attendanceByCommission, getCommissionAvgAttendance } from "@/data/mockData";
 import DataTable from "@/components/DataTable";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
@@ -7,6 +8,16 @@ type AdminView = "commissions" | "tutors" | "students";
 
 export default function AdminDashboard() {
   const [view, setView] = useState<AdminView>("commissions");
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const viewParam = searchParams.get("view");
+    if (viewParam === "students") {
+      setView("students");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const totalStudents = students.length;
   const avgGlobal = Math.round(
@@ -137,7 +148,16 @@ export default function AdminDashboard() {
             </button>
           ))}
         </div>
-        <DataTable columns={config.columns} data={config.data} onAdd={() => {}} addLabel={config.addLabel} />
+        <DataTable
+          columns={config.columns}
+          data={config.data}
+          onAdd={() => {
+            if (view === "students") {
+              navigate("/admin/add-student");
+            }
+          }}
+          addLabel={config.addLabel}
+        />
       </div>
 
       {/* Right: Metrics */}
