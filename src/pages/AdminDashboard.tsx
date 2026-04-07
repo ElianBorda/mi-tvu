@@ -8,6 +8,16 @@ type AdminView = "commissions" | "tutors" | "students";
 
 export default function AdminDashboard() {
   const [view, setView] = useState<AdminView>("commissions");
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const viewParam = searchParams.get("view");
+    if (viewParam === "students") {
+      setView("students");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const totalStudents = students.length;
   const avgGlobal = Math.round(

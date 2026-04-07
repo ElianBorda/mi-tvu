@@ -40,7 +40,7 @@ export default function DataTable({ columns, data, onAdd, addLabel = "Agregar" }
           />
         </div>
         {onAdd && (
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+          <button onClick={onAdd} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
             <Plus size={14} /> {addLabel}
           </button>
         )}
