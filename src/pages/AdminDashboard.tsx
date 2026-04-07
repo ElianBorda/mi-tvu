@@ -148,7 +148,16 @@ export default function AdminDashboard() {
             </button>
           ))}
         </div>
-        <DataTable columns={config.columns} data={config.data} onAdd={() => {}} addLabel={config.addLabel} />
+        <DataTable
+          columns={config.columns}
+          data={config.data}
+          onAdd={() => {
+            if (view === "students") {
+              navigate("/admin/add-student");
+            }
+          }}
+          addLabel={config.addLabel}
+        />
       </div>
 
       {/* Right: Metrics */}
