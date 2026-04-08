@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown, Check } from "lucide-react";
 import { commissions } from "@/data/mockData";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function AddTutor() {
   const navigate = useNavigate();
@@ -19,11 +17,20 @@ export default function AddTutor() {
     lastName: "",
     firstName: "",
     dni: "",
-    commissionId: "",
+    commissionIds: [] as string[],
   });
 
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const toggleCommission = (id: string) => {
+    setForm(prev => ({
+      ...prev,
+      commissionIds: prev.commissionIds.includes(id)
+        ? prev.commissionIds.filter(c => c !== id)
+        : [...prev.commissionIds, id],
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,6 +42,10 @@ export default function AddTutor() {
     toast.success(`Tutor ${form.lastName}, ${form.firstName} creado exitosamente.`);
     navigate("/?view=tutors");
   };
+
+  const selectedLabels = commissions
+    .filter(c => form.commissionIds.includes(c.id))
+    .map(c => c.name);
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,22 +99,40 @@ export default function AddTutor() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="commission">Comisiones (opcional)</Label>
-              <Select
-                value={form.commissionId}
-                onValueChange={val => handleChange("commissionId", val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar comisión..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {commissions.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name} — {c.locality}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Comisiones (opcional)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span className="truncate text-muted-foreground">
+                      {selectedLabels.length > 0
+                        ? selectedLabels.join(", ")
+                        : "Seleccionar comisiones..."}
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-1 max-h-60 overflow-y-auto" align="start">
+                  {commissions.map(c => {
+                    const selected = form.commissionIds.includes(c.id);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleCommission(c.id)}
+                        className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                      >
+                        <span className="flex h-4 w-4 items-center justify-center rounded border border-primary shrink-0">
+                          {selected && <Check className="h-3 w-3 text-primary" />}
+                        </span>
+                        {c.name} — {c.locality}
+                      </button>
+                    );
+                  })}
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="pt-4">
