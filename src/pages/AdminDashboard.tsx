@@ -16,6 +16,9 @@ export default function AdminDashboard() {
     if (viewParam === "students") {
       setView("students");
       setSearchParams({}, { replace: true });
+    } else if (viewParam === "tutors") {
+      setView("tutors");
+      setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 
@@ -152,9 +155,8 @@ export default function AdminDashboard() {
           columns={config.columns}
           data={config.data}
           onAdd={() => {
-            if (view === "students") {
-              navigate("/admin/add-student");
-            }
+            if (view === "students") navigate("/admin/add-student");
+            else if (view === "tutors") navigate("/admin/add-tutor");
           }}
           addLabel={config.addLabel}
         />
