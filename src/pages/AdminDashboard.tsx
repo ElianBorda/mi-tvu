@@ -16,6 +16,9 @@ export default function AdminDashboard() {
     if (viewParam === "students") {
       setView("students");
       setSearchParams({}, { replace: true });
+    } else if (viewParam === "tutors") {
+      setView("tutors");
+      setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 
