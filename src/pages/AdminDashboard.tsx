@@ -155,9 +155,8 @@ export default function AdminDashboard() {
           columns={config.columns}
           data={config.data}
           onAdd={() => {
-            if (view === "students") {
-              navigate("/admin/add-student");
-            }
+            if (view === "students") navigate("/admin/add-student");
+            else if (view === "tutors") navigate("/admin/add-tutor");
           }}
           addLabel={config.addLabel}
         />
