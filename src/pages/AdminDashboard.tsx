@@ -19,6 +19,9 @@ export default function AdminDashboard() {
     } else if (viewParam === "tutors") {
       setView("tutors");
       setSearchParams({}, { replace: true });
+    } else if (viewParam === "commissions") {
+      setView("commissions");
+      setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 
@@ -157,6 +160,7 @@ export default function AdminDashboard() {
           onAdd={() => {
             if (view === "students") navigate("/admin/add-student");
             else if (view === "tutors") navigate("/admin/add-tutor");
+            else if (view === "commissions") navigate("/admin/add-commission");
           }}
           addLabel={config.addLabel}
         />
