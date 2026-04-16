@@ -56,6 +56,7 @@ export default function AdminDashboard() {
   const commissionData = commissions.map(c => {
     const t = tutors.find(tt => tt.id === c.tutorId);
     return {
+      id: c.id,
       nombre: c.name,
       localidad: c.locality,
       departamento: c.department,
@@ -163,6 +164,9 @@ export default function AdminDashboard() {
             else if (view === "commissions") navigate("/admin/add-commission");
           }}
           addLabel={config.addLabel}
+          onEdit={(row) => {
+            if (view === "commissions" && row.id) navigate(`/admin/edit-commission/${row.id}`);
+          }}
         />
       </div>
 

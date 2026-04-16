@@ -22,6 +22,7 @@ const App = () => (
           <Route path="/admin/add-student" element={<AddStudent />} />
           <Route path="/admin/add-tutor" element={<AddTutor />} />
           <Route path="/admin/add-commission" element={<AddCommission />} />
+          <Route path="/admin/edit-commission/:id" element={<AddCommission />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
