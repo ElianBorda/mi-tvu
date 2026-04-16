@@ -22,9 +22,10 @@ interface Props {
   data: Record<string, any>[];
   onAdd?: () => void;
   addLabel?: string;
+  onEdit?: (row: Record<string, any>) => void;
 }
 
-export default function DataTable({ columns, data, onAdd, addLabel = "Agregar" }: Props) {
+export default function DataTable({ columns, data, onAdd, addLabel = "Agregar", onEdit }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
@@ -85,7 +86,7 @@ export default function DataTable({ columns, data, onAdd, addLabel = "Agregar" }
                 <td className="px-4 py-2.5 text-right">
                   <div className="opacity-0 group-hover:opacity-100 flex items-center justify-end gap-1 transition-opacity">
                     <button className="p-1 rounded hover:bg-secondary"><Eye size={14} className="text-muted-foreground" /></button>
-                    <button className="p-1 rounded hover:bg-secondary"><Pencil size={14} className="text-muted-foreground" /></button>
+                    <button onClick={() => onEdit?.(row)} className="p-1 rounded hover:bg-secondary"><Pencil size={14} className="text-muted-foreground" /></button>
                     <button onClick={() => setDeleteIndex(page * perPage + i)} className="p-1 rounded hover:bg-secondary"><Trash2 size={14} className="text-destructive" /></button>
                   </div>
                 </td>
