@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { commissions, calendarEvents } from "@/data/mockData";
 import CommissionDetail from "@/components/CommissionDetail";
 import SlidePanel from "@/components/SlidePanel";
@@ -7,11 +6,29 @@ import CalendarPanel from "@/components/CalendarPanel";
 interface Props {
   showCalendar: boolean;
   onCloseCalendar: () => void;
+  unenrolled?: boolean;
 }
 
-export default function StudentDashboard({ showCalendar, onCloseCalendar }: Props) {
+export default function StudentDashboard({ showCalendar, onCloseCalendar, unenrolled }: Props) {
   const studentCommission = commissions.find(c => c.id === "c1")!;
   const studentEvents = calendarEvents.filter(e => e.commissionId === studentCommission.id);
+
+  if (unenrolled) {
+    return (
+      <div className="relative">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="bg-card border border-border rounded-xl shadow-card px-8 py-12 max-w-lg w-full text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground">
+              Te diste de baja del taller
+            </h2>
+            <p className="text-sm text-muted-foreground mt-3">
+              Ya no estás inscripto en ninguna comisión.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

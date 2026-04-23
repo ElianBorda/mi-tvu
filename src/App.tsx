@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import AddStudent from "./pages/AddStudent.tsx";
 import AddTutor from "./pages/AddTutor.tsx";
 import AddCommission from "./pages/AddCommission.tsx";
+import UnenrollStudent from "./pages/UnenrollStudent.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/admin/add-tutor" element={<AddTutor />} />
           <Route path="/admin/add-commission" element={<AddCommission />} />
           <Route path="/admin/edit-commission/:id" element={<AddCommission />} />
+          <Route path="/student/unenroll" element={<UnenrollStudent />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
