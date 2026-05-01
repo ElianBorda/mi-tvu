@@ -47,7 +47,7 @@ export default function StudentDashboard({ showCalendar, onCloseCalendar, unenro
     <div className="relative">
       <CommissionDetail commission={studentCommission} role="student" />
       <SlidePanel open={showCalendar} onClose={onCloseCalendar} title="Calendario académico">
-        <CalendarPanel events={studentEvents} />
+        <CalendarPanel events={studentEvents} onAddEvent={() => {}} />
       </SlidePanel>
     </div>
   );
