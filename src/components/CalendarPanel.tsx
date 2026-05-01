@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { CalendarEvent } from "@/data/types";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
@@ -17,14 +17,31 @@ interface Props {
   onAddEvent?: () => void;
 }
 
+const STORAGE_KEY = "customCalendarEvents";
+
 export default function CalendarPanel({ events: initialEvents, onAddEvent }: Props) {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [extraEvents, setExtraEvents] = useState<CalendarEvent[]>([]);
+  const [extraEvents, setExtraEvents] = useState<CalendarEvent[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as CalendarEvent[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [eventDate, setEventDate] = useState<Date | undefined>(undefined);
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(extraEvents));
+    } catch {
+      /* ignore */
+    }
+  }, [extraEvents]);
 
   const events = useMemo(() => [...initialEvents, ...extraEvents], [initialEvents, extraEvents]);
 
