@@ -3,15 +3,30 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CalendarEvent } from "@/data/types";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface Props {
   events: CalendarEvent[];
   onAddEvent?: () => void;
 }
 
-export default function CalendarPanel({ events, onAddEvent }: Props) {
+export default function CalendarPanel({ events: initialEvents, onAddEvent }: Props) {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [extraEvents, setExtraEvents] = useState<CalendarEvent[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [form, setForm] = useState({
+    date: "",
+    commissionName: "",
+    startTime: "",
+    endTime: "",
+    classroom: "",
+  });
+
+  const events = useMemo(() => [...initialEvents, ...extraEvents], [initialEvents, extraEvents]);
 
   const days = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 1 });
@@ -29,6 +44,37 @@ export default function CalendarPanel({ events, onAddEvent }: Props) {
     events.filter(e => isSameDay(new Date(e.date), date));
 
   const selectedEvents = selectedDate ? eventsForDate(selectedDate) : [];
+
+  const openDialog = () => {
+    if (onAddEvent) onAddEvent();
+    setForm({
+      date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : "",
+      commissionName: "",
+      startTime: "",
+      endTime: "",
+      classroom: "",
+    });
+    setDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!form.date || !form.commissionName || !form.startTime || !form.endTime || !form.classroom) {
+      toast.error("Completá todos los campos.");
+      return;
+    }
+    const newEvent: CalendarEvent = {
+      date: form.date,
+      commissionId: `custom-${Date.now()}`,
+      commissionName: form.commissionName,
+      schedule: `${form.startTime}–${form.endTime}`,
+      classroom: form.classroom,
+    };
+    setExtraEvents(prev => [...prev, newEvent]);
+    setDialogOpen(false);
+    toast.success("Evento agregado al calendario.");
+    setSelectedDate(new Date(form.date));
+    setCurrentMonth(new Date(form.date));
+  };
 
   return (
     <div className="bg-card rounded-lg shadow-card border border-border p-5">
@@ -63,7 +109,7 @@ export default function CalendarPanel({ events, onAddEvent }: Props) {
           return (
             <button
               key={i}
-              onClick={() => hasEvents ? setSelectedDate(day) : setSelectedDate(null)}
+              onClick={() => hasEvents ? setSelectedDate(day) : setSelectedDate(day)}
               className={`relative h-9 text-xs font-medium rounded transition-colors
                 ${inMonth ? "text-foreground" : "text-muted-foreground/40"}
                 ${isSelected ? "bg-primary text-primary-foreground" : isToday ? "bg-secondary" : "hover:bg-secondary"}
@@ -93,14 +139,58 @@ export default function CalendarPanel({ events, onAddEvent }: Props) {
         </div>
       )}
 
-      {onAddEvent && (
-        <button
-          onClick={onAddEvent}
-          className="mt-4 w-full py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
-        >
-          + Agregar evento
-        </button>
-      )}
+      <button
+        onClick={openDialog}
+        className="mt-4 w-full py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
+      >
+        + Agregar evento
+      </button>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar evento</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-date">Fecha</Label>
+              <Input id="ev-date" type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-name">Nombre / Comisión</Label>
+              <Input id="ev-name" placeholder="Ej: Comisión 3" value={form.commissionName} onChange={e => setForm({ ...form, commissionName: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-start">Hora inicio</Label>
+                <Input id="ev-start" type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-end">Hora fin</Label>
+                <Input id="ev-end" type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-class">Aula</Label>
+              <Input id="ev-class" placeholder="Ej: Aula 45" value={form.classroom} onChange={e => setForm({ ...form, classroom: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <button
+              onClick={() => setDialogOpen(false)}
+              className="px-4 py-2 text-sm font-medium rounded-md border border-border hover:bg-secondary transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Guardar
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
