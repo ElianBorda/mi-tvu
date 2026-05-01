@@ -1,11 +1,15 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { CalendarEvent } from "@/data/types";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Props {
@@ -18,13 +22,9 @@ export default function CalendarPanel({ events: initialEvents, onAddEvent }: Pro
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [extraEvents, setExtraEvents] = useState<CalendarEvent[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({
-    date: "",
-    commissionName: "",
-    startTime: "",
-    endTime: "",
-    classroom: "",
-  });
+  const [eventDate, setEventDate] = useState<Date | undefined>(undefined);
+  const [eventName, setEventName] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
 
   const events = useMemo(() => [...initialEvents, ...extraEvents], [initialEvents, extraEvents]);
 
@@ -47,33 +47,29 @@ export default function CalendarPanel({ events: initialEvents, onAddEvent }: Pro
 
   const openDialog = () => {
     if (onAddEvent) onAddEvent();
-    setForm({
-      date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : "",
-      commissionName: "",
-      startTime: "",
-      endTime: "",
-      classroom: "",
-    });
+    setEventDate(selectedDate ?? undefined);
+    setEventName("");
+    setEventDescription("");
     setDialogOpen(true);
   };
 
   const handleSave = () => {
-    if (!form.date || !form.commissionName || !form.startTime || !form.endTime || !form.classroom) {
+    if (!eventDate || !eventName.trim() || !eventDescription.trim()) {
       toast.error("Completá todos los campos.");
       return;
     }
     const newEvent: CalendarEvent = {
-      date: form.date,
+      date: format(eventDate, "yyyy-MM-dd"),
       commissionId: `custom-${Date.now()}`,
-      commissionName: form.commissionName,
-      schedule: `${form.startTime}–${form.endTime}`,
-      classroom: form.classroom,
+      commissionName: eventName.trim(),
+      name: eventName.trim(),
+      description: eventDescription.trim(),
     };
     setExtraEvents(prev => [...prev, newEvent]);
     setDialogOpen(false);
     toast.success("Evento agregado al calendario.");
-    setSelectedDate(new Date(form.date));
-    setCurrentMonth(new Date(form.date));
+    setSelectedDate(eventDate);
+    setCurrentMonth(eventDate);
   };
 
   return (
@@ -109,7 +105,7 @@ export default function CalendarPanel({ events: initialEvents, onAddEvent }: Pro
           return (
             <button
               key={i}
-              onClick={() => hasEvents ? setSelectedDate(day) : setSelectedDate(day)}
+              onClick={() => setSelectedDate(day)}
               className={`relative h-9 text-xs font-medium rounded transition-colors
                 ${inMonth ? "text-foreground" : "text-muted-foreground/40"}
                 ${isSelected ? "bg-primary text-primary-foreground" : isToday ? "bg-secondary" : "hover:bg-secondary"}
@@ -132,8 +128,12 @@ export default function CalendarPanel({ events: initialEvents, onAddEvent }: Pro
           </p>
           {selectedEvents.map((e, i) => (
             <div key={i} className="bg-secondary rounded-md px-3 py-2">
-              <p className="text-xs font-medium text-foreground">{e.commissionName}</p>
-              <p className="text-[10px] text-muted-foreground">{e.schedule} · {e.classroom}</p>
+              <p className="text-xs font-medium text-foreground">{e.name ?? e.commissionName}</p>
+              {e.description ? (
+                <p className="text-[10px] text-muted-foreground whitespace-pre-wrap">{e.description}</p>
+              ) : (
+                <p className="text-[10px] text-muted-foreground">{e.schedule} · {e.classroom}</p>
+              )}
             </div>
           ))}
         </div>
@@ -152,27 +152,40 @@ export default function CalendarPanel({ events: initialEvents, onAddEvent }: Pro
             <DialogTitle>Agregar evento</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="ev-date">Fecha</Label>
-              <Input id="ev-date" type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+            <div className="space-y-1.5 flex flex-col">
+              <Label>Fecha</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex h-10 w-full items-center justify-start gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm text-left",
+                      !eventDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon size={16} className="opacity-60" />
+                    {eventDate ? format(eventDate, "PPP", { locale: es }) : <span>Seleccioná una fecha</span>}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={eventDate}
+                    onSelect={setEventDate}
+                    initialFocus
+                    locale={es}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ev-name">Nombre / Comisión</Label>
-              <Input id="ev-name" placeholder="Ej: Comisión 3" value={form.commissionName} onChange={e => setForm({ ...form, commissionName: e.target.value })} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="ev-start">Hora inicio</Label>
-                <Input id="ev-start" type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="ev-end">Hora fin</Label>
-                <Input id="ev-end" type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} />
-              </div>
+              <Label htmlFor="ev-name">Nombre del evento</Label>
+              <Input id="ev-name" placeholder="Ej: Entrega de TP final" value={eventName} onChange={e => setEventName(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ev-class">Aula</Label>
-              <Input id="ev-class" placeholder="Ej: Aula 45" value={form.classroom} onChange={e => setForm({ ...form, classroom: e.target.value })} />
+              <Label htmlFor="ev-desc">Descripción</Label>
+              <Textarea id="ev-desc" placeholder="Detalles del evento..." rows={4} value={eventDescription} onChange={e => setEventDescription(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
