@@ -52,8 +52,10 @@ export interface CalendarEvent {
   date: string;
   commissionId: string;
   commissionName: string;
-  schedule: string;
-  classroom: string;
+  schedule?: string;
+  classroom?: string;
+  name?: string;
+  description?: string;
 }
 
 export interface Notification {
